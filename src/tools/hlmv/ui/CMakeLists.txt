@@ -1,20 +1,16 @@
-target_sources(${TARGET_NAME}
+target_sources(HLMV
 	PRIVATE
-		C3DView.cpp
-		C3DView.h
-		CFullscreenWindow.cpp
-		CFullscreenWindow.h
-		CMainPanel.cpp
-		CMainPanel.h
-		CMainWindow.cpp
-		CMainWindow.h
-		CModelViewerApp.cpp
-		CModelViewerApp.h
-		CStudioTypesCheatSheet.cpp
-		CStudioTypesCheatSheet.h
-		MouseOpFlag.h
-		wxHLMV.h)
+		HLMVMainWindow.cpp
+		HLMVMainWindow.h
+		HLMVMainWindow.ui
+		MainPanel.cpp
+		MainPanel.h
+		MainPanel.ui
+		ViewerDocument.cpp
+		ViewerDocument.h
+		ViewerDocument.ui
+		ViewerWindow.cpp
+		ViewerWindow.h)
 
-add_subdirectory(common)
 add_subdirectory(controlpanels)
 add_subdirectory(options)

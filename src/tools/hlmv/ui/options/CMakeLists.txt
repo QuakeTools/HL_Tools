@@ -1,8 +1,8 @@
-target_sources(${TARGET_NAME}
+target_sources(HLMV
 	PRIVATE
-	CCompilerOptions.cpp
-	CCompilerOptions.h
-	CGeneralOptions.cpp
-	CGeneralOptions.h
-	COptionsDialog.cpp
-	COptionsDialog.h)
+		OptionsDialog.cpp
+		OptionsDialog.h
+		OptionsDialog.ui
+		OptionsPageGeneral.cpp
+		OptionsPageGeneral.h
+		OptionsPageGeneral.ui)
