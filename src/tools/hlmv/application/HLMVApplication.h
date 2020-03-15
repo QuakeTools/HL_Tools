@@ -1,9 +1,11 @@
 #pragma once
 
-#include <QLocalServer>
 #include <QMainWindow>
 #include <QObject>
 #include <QScopedPointer>
+#include <QString>
+
+#include "application/SingleInstance.h"
 
 namespace ui
 {
@@ -26,11 +28,11 @@ public:
 private slots:
 	void OnExit();
 
-	void OnNewConnection();
+	void OnFileNameReceived(const QString& fileName);
 
 private:
 	ui::HLMVMainWindow* _mainWindow;
 
 	//Used to manage single-instance functionality
-	QScopedPointer<QLocalServer> _server;
+	QScopedPointer<SingleInstance> singleInstance;
 };

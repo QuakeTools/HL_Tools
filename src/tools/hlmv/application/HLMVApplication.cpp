@@ -77,31 +77,14 @@ int HLMVApplication::Run(int argc, char* argv[])
 
 	if (useSingleInstance)
 	{
-		//Check if an instance is already running
-		QLocalSocket socket;
+		singleInstance.reset(new SingleInstance());
 
-		socket.connectToServer(programName, QIODevice::OpenModeFlag::WriteOnly);
-
-		if (socket.waitForConnected(1000))
+		if (!singleInstance->Create(programName, fileName))
 		{
-			//If a filename was specified, this will open the file in the existing instance
-			//Otherwise, the existing instance can choose to set focus on itself
-			socket.write(fileName.toStdString().c_str());
-
-			socket.waitForBytesWritten(-1);
-			socket.waitForDisconnected(-1);
-
-			return 0;
+			return false;
 		}
-	}
 
-	if (useSingleInstance)
-	{
-		_server.reset(new QLocalServer());
-
-		connect(_server.get(), &QLocalServer::newConnection, this, &HLMVApplication::OnNewConnection);
-
-		_server->listen(programName);
+		connect(singleInstance.get(), &SingleInstance::FileNameReceived, this, &HLMVApplication::OnFileNameReceived);
 	}
 
 	_mainWindow = new ui::HLMVMainWindow();
@@ -117,25 +100,24 @@ void HLMVApplication::OnExit()
 {
 	_mainWindow = nullptr;
 
-	if (_server)
+	if (singleInstance)
 	{
-		_server->close();
-		_server.reset();
+		singleInstance.reset();
 	}
 }
 
-void HLMVApplication::OnNewConnection()
+void HLMVApplication::OnFileNameReceived(const QString& fileName)
 {
-	auto socket = _server->nextPendingConnection();
+	//TODO: load file
 
-	if (socket->waitForReadyRead(1000))
+	if (_mainWindow->isMaximized())
 	{
-		const auto buffer = socket->readAll();
-
-		const QString fileName{buffer};
-
-		//TODO: load model
+		_mainWindow->showMaximized();
+	}
+	else
+	{
+		_mainWindow->showNormal();
 	}
 
-	socket->close();
+	_mainWindow->activateWindow();
 }
