@@ -35,6 +35,10 @@ find_library(GLEW_LIBRARY glew32s
 set_target_properties(GLEW::glew PROPERTIES INTERFACE_INCLUDE_DIRECTORIES ${GLEW_INCLUDE_DIR})
 set_target_properties(GLEW::glew PROPERTIES IMPORTED_LOCATION ${GLEW_LIBRARY})
 
+target_compile_definitions(GLEW::glew
+	INTERFACE
+		GLEW_STATIC)
+
 unset(GLEW_LIBRARY CACHE)
 
 function(copy_qt_dependencies target_name plugins)
