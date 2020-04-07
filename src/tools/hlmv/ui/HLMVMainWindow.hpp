@@ -17,8 +17,6 @@ public:
 	~HLMVMainWindow();
 
 private slots:
-	void OnLoadModel();
-
 	void OnOpenOptionsDialog();
 
 private:

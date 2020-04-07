@@ -9,8 +9,8 @@
 #include <QStyleFactory>
 #include <QSurfaceFormat>
 
-#include "application/HLMVApplication.h"
-#include "ui/HLMVMainWindow.h"
+#include "application/HLMVApplication.hpp"
+#include "ui/HLMVMainWindow.hpp"
 
 int HLMVApplication::Run(int argc, char* argv[])
 {
@@ -31,9 +31,9 @@ int HLMVApplication::Run(int argc, char* argv[])
 	{
 		QSurfaceFormat defaultFormat(QSurfaceFormat::FormatOption::DebugContext | QSurfaceFormat::FormatOption::DeprecatedFunctions);
 
-		defaultFormat.setMajorVersion(1);
-		defaultFormat.setMinorVersion(0);
-		defaultFormat.setProfile(QSurfaceFormat::OpenGLContextProfile::NoProfile);
+		defaultFormat.setMajorVersion(3);
+		defaultFormat.setMinorVersion(3);
+		defaultFormat.setProfile(QSurfaceFormat::OpenGLContextProfile::CoreProfile);
 
 		defaultFormat.setDepthBufferSize(24);
 		defaultFormat.setStencilBufferSize(8);
@@ -89,6 +89,7 @@ int HLMVApplication::Run(int argc, char* argv[])
 
 	_mainWindow = new ui::HLMVMainWindow();
 
+	//TODO: doesn't actually show maximized
 	_mainWindow->showMaximized();
 
 	//TODO: open file specified on command line

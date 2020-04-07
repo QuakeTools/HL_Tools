@@ -1,4 +1,4 @@
-#include "ui/options/OptionsPageGeneral.h"
+#include "ui/options/OptionsPageGeneral.hpp"
 
 namespace ui::options
 {

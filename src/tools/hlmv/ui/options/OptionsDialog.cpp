@@ -1,5 +1,5 @@
-#include "ui/options/OptionsDialog.h"
-#include "ui/options/OptionsPageGeneral.h"
+#include "ui/options/OptionsDialog.hpp"
+#include "ui/options/OptionsPageGeneral.hpp"
 
 namespace ui::options
 {

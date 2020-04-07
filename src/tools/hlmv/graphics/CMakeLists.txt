@@ -1,0 +1,19 @@
+target_sources(HLMV
+	PRIVATE
+		GraphicsDefinitions.hpp
+		GraphicsUtilities.cpp
+		GraphicsUtilities.hpp
+		IRenderable.hpp
+		RenderContext.hpp
+		Renderer.cpp
+		Renderer.hpp
+		RenderQueue.hpp
+		Scene.hpp
+		SceneContext.cpp
+		SceneContext.hpp
+		SceneRenderer.cpp
+		SceneRenderer.hpp)
+
+add_subdirectory(api)
+add_subdirectory(components)
+add_subdirectory(objects)

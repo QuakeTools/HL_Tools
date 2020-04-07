@@ -6,7 +6,8 @@ target_link_libraries(HLMV
 		Qt5::Network
 		glm
 		GLEW::glew
-		OpenGL::GL)
+		OpenGL::GL
+		EnTT::EnTT)
 
 target_compile_options(HLMV
 	PRIVATE
@@ -18,7 +19,11 @@ target_sources(HLMV
 		Main.cpp)
 
 add_subdirectory(application)
+add_subdirectory(game)
+add_subdirectory(graphics)
+add_subdirectory(models)
 add_subdirectory(ui)
+add_subdirectory(utility)
 
 #Create filters
 get_target_property(SOURCE_FILES HLMV SOURCES)
@@ -50,5 +55,12 @@ copy_qt_dependencies(HLMV Qt5Core_PLUGINS)
 copy_qt_dependencies(HLMV Qt5Gui_PLUGINS)
 copy_qt_dependencies(HLMV Qt5Widgets_PLUGINS)
 copy_qt_dependencies(HLMV Qt5Network_PLUGINS)
+
+# Copy resources
+add_custom_command(TARGET HLMV POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_directory
+		${CMAKE_CURRENT_SOURCE_DIR}/resources
+		${CMAKE_CURRENT_BINARY_DIR}/resources
+)
 
 set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT HLMV)

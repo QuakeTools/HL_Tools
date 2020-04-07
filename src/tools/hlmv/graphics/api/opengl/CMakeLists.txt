@@ -1,0 +1,19 @@
+target_sources(HLMV
+	PRIVATE
+		OpenGLDeviceBuffer.cpp
+		OpenGLDeviceBuffer.hpp
+		OpenGLEnumConverters.cpp
+		OpenGLEnumConverters.hpp
+		OpenGLGraphicsDevice.cpp
+		OpenGLGraphicsDevice.hpp
+		OpenGLPipeline.cpp
+		OpenGLPipeline.hpp
+		OpenGLResourceFactory.cpp
+		OpenGLResourceFactory.hpp
+		OpenGLShader.cpp
+		OpenGLShader.hpp
+		OpenGLSwapChainFrameBuffer.hpp
+		OpenGLTexture.cpp
+		OpenGLTexture.hpp
+		OpenGLUtils.cpp
+		OpenGLUtils.hpp)

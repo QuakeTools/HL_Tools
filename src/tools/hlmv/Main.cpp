@@ -1,4 +1,4 @@
-#include "application/HLMVApplication.h"
+#include "application/HLMVApplication.hpp"
 
 int main(int argc, char* argv[])
 {

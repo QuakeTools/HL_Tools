@@ -5,7 +5,7 @@
 #include <QScopedPointer>
 #include <QString>
 
-#include "application/SingleInstance.h"
+#include "application/SingleInstance.hpp"
 
 namespace ui
 {

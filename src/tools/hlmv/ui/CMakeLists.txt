@@ -1,16 +1,16 @@
 target_sources(HLMV
 	PRIVATE
+		ControlPanels.cpp
+		ControlPanels.hpp
+		ControlPanels.ui
 		HLMVMainWindow.cpp
-		HLMVMainWindow.h
+		HLMVMainWindow.hpp
 		HLMVMainWindow.ui
 		MainPanel.cpp
-		MainPanel.h
+		MainPanel.hpp
 		MainPanel.ui
-		ViewerDocument.cpp
-		ViewerDocument.h
-		ViewerDocument.ui
 		ViewerWindow.cpp
-		ViewerWindow.h)
+		ViewerWindow.hpp)
 
 add_subdirectory(controlpanels)
 add_subdirectory(options)

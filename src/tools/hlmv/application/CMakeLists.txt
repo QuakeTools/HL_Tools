@@ -1,6 +1,6 @@
 target_sources(HLMV
 	PRIVATE
 		HLMVApplication.cpp
-		HLMVApplication.h
+		HLMVApplication.hpp
 		SingleInstance.cpp
-		SingleInstance.h)
+		SingleInstance.hpp)

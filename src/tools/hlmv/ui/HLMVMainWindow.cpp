@@ -1,9 +1,7 @@
-#include <QFileDialog>
+#include "ui/HLMVMainWindow.hpp"
+#include "ui/MainPanel.hpp"
 
-#include "ui/HLMVMainWindow.h"
-#include "ui/MainPanel.h"
-
-#include "ui/options/OptionsDialog.h"
+#include "ui/options/OptionsDialog.hpp"
 
 namespace ui
 {
@@ -19,21 +17,11 @@ HLMVMainWindow::HLMVMainWindow()
 
 	setCentralWidget(_mainPanel);
 
-	connect(_ui.ActionLoadModel, &QAction::triggered, this, &HLMVMainWindow::OnLoadModel);
+	connect(_ui.ActionLoadModel, &QAction::triggered, _mainPanel, &MainPanel::PromptLoadModel);
 	connect(_ui.ActionOptions, &QAction::triggered, this, &HLMVMainWindow::OnOpenOptionsDialog);
 }
 
 HLMVMainWindow::~HLMVMainWindow() = default;
-
-void HLMVMainWindow::OnLoadModel()
-{
-	if (const auto fileName = QFileDialog::getOpenFileName(this, "Select model", {}, "Studio model files (*.mdl *.dol);;All files (*.*)");
-		!fileName.isEmpty())
-	{
-		//TODO: load model
-		_mainPanel->AddDocumentForModel(fileName);
-	}
-}
 
 void HLMVMainWindow::OnOpenOptionsDialog()
 {

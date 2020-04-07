@@ -1,8 +1,8 @@
 target_sources(HLMV
 	PRIVATE
 		OptionsDialog.cpp
-		OptionsDialog.h
+		OptionsDialog.hpp
 		OptionsDialog.ui
 		OptionsPageGeneral.cpp
-		OptionsPageGeneral.h
+		OptionsPageGeneral.hpp
 		OptionsPageGeneral.ui)

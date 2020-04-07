@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>861</width>
-    <height>78</height>
+    <width>882</width>
+    <height>132</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -21,19 +21,19 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
-    <number>0</number>
+    <number>9</number>
    </property>
    <property name="topMargin">
-    <number>0</number>
+    <number>9</number>
    </property>
    <property name="rightMargin">
-    <number>0</number>
+    <number>9</number>
    </property>
    <property name="bottomMargin">
-    <number>0</number>
+    <number>9</number>
    </property>
    <property name="spacing">
-    <number>0</number>
+    <number>6</number>
    </property>
    <item row="0" column="0">
     <widget class="QGroupBox" name="RenderPropertiesGroup">
@@ -42,19 +42,19 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <property name="leftMargin">
-       <number>0</number>
+       <number>9</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>9</number>
       </property>
       <property name="rightMargin">
-       <number>0</number>
+       <number>9</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>9</number>
       </property>
       <property name="spacing">
-       <number>0</number>
+       <number>6</number>
       </property>
       <item row="0" column="0">
        <widget class="QLabel" name="label">
@@ -157,7 +157,7 @@
          </size>
         </property>
         <property name="currentText">
-         <string>Texture Shaded</string>
+         <string>Wireframe</string>
         </property>
         <item>
          <property name="text">
@@ -239,19 +239,19 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
       <property name="leftMargin">
-       <number>0</number>
+       <number>9</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>9</number>
       </property>
       <property name="rightMargin">
-       <number>0</number>
+       <number>9</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>9</number>
       </property>
       <property name="spacing">
-       <number>0</number>
+       <number>6</number>
       </property>
       <item row="2" column="4">
        <widget class="QCheckBox" name="MirrorOnZAxis">
@@ -290,7 +290,7 @@
       <item row="0" column="2">
        <widget class="QCheckBox" name="ShowAxes">
         <property name="text">
-         <string>Show Axes</string>
+         <string>Axes</string>
         </property>
        </widget>
       </item>
@@ -311,56 +311,56 @@
       <item row="0" column="1">
        <widget class="QCheckBox" name="ShowNormals">
         <property name="text">
-         <string>Show Normals</string>
+         <string>Normals</string>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
        <widget class="QCheckBox" name="ShowPlayerHitbox">
         <property name="text">
-         <string>Show Player Hitbox</string>
+         <string>Player Hitbox</string>
         </property>
        </widget>
       </item>
       <item row="2" column="1">
        <widget class="QCheckBox" name="ShowHitboxes">
         <property name="text">
-         <string>Show Hit Boxes</string>
+         <string>Hit Boxes</string>
         </property>
        </widget>
       </item>
       <item row="0" column="0">
        <widget class="QCheckBox" name="ShowBones">
         <property name="text">
-         <string>Show Bones</string>
+         <string>Bones</string>
         </property>
        </widget>
       </item>
       <item row="1" column="0">
        <widget class="QCheckBox" name="ShowAttachments">
         <property name="text">
-         <string>Show Attachments</string>
+         <string>Attachments</string>
         </property>
        </widget>
       </item>
       <item row="2" column="0">
        <widget class="QCheckBox" name="ShowEyePosition">
         <property name="text">
-         <string>Show Eye Position</string>
+         <string>Eye Position</string>
         </property>
        </widget>
       </item>
       <item row="1" column="2">
        <widget class="QCheckBox" name="ShowCrosshair">
         <property name="text">
-         <string>Show Crosshair</string>
+         <string>Crosshair</string>
         </property>
        </widget>
       </item>
       <item row="2" column="2">
        <widget class="QCheckBox" name="ShowGuidelines">
         <property name="text">
-         <string>Show Guidelines</string>
+         <string>Guidelines</string>
         </property>
        </widget>
       </item>

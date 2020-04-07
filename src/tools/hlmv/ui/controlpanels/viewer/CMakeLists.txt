@@ -1,5 +1,5 @@
 target_sources(HLMV
 	PRIVATE
 		ModelDisplayPanel.cpp
-		ModelDisplayPanel.h
+		ModelDisplayPanel.hpp
 		ModelDisplayPanel.ui)

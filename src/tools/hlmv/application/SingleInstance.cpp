@@ -1,6 +1,6 @@
 #include <QLocalSocket>
 
-#include "application/SingleInstance.h"
+#include "application/SingleInstance.hpp"
 
 bool SingleInstance::Create(const QString& serverName, const QString& fileName)
 {

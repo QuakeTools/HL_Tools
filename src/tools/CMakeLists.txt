@@ -41,6 +41,8 @@ target_compile_definitions(GLEW::glew
 
 unset(GLEW_LIBRARY CACHE)
 
+find_package(ENTT REQUIRED)
+
 function(copy_qt_dependencies target_name plugins)
 	foreach(plugin ${${plugins}})
 		# Copy plugins to the directory relative to the plugins directory in the Qt install directory
