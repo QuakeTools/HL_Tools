@@ -26,6 +26,8 @@ enum class ProjectionMode
 	Orthographic
 };
 
+constexpr glm::vec3 FirstPersonPosition{0.f, 0.f, 1.f};
+
 /**
 *	@brief A single camera
 *	Must be coupled with a @see engine::game::components::Transform component to have a location and orientation
