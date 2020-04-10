@@ -141,7 +141,7 @@ void FirstPersonCameraOperator::UpdateCamera(entt::registry& registry, entt::ent
 	auto& rotationEulerXYZ = registry.get<game::components::RotationEulerXYZ>(cameraEntity);
 
 	//Set view to what the game uses for first person
-	translation.Value= graphics::components::FirstPersonPosition;
+	translation.Value = graphics::components::FirstPersonPosition;
 
 	rotationEulerXYZ.Value = glm::vec3{0.f};
 }
