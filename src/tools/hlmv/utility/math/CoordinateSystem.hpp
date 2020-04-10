@@ -7,9 +7,9 @@
 
 namespace math
 {
-constexpr glm::vec3 DefaultForwardDirection{1, 0, 0};
-constexpr glm::vec3 DefaultRightDirection{0, 1, 0};
-constexpr glm::vec3 DefaultUpDirection{0, 0, 1};
+constexpr glm::vec3 ForwardVector{1, 0, 0};
+constexpr glm::vec3 RightVector{0, 1, 0};
+constexpr glm::vec3 UpVector{0, 0, 1};
 constexpr double MaxAngle = 360.0;
 
 constexpr glm::vec3 GetPosition(const glm::mat4x4& matrix)

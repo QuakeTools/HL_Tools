@@ -76,12 +76,12 @@ inline void SetArcballCameraParameters(entt::registry& registry, entt::entity ca
 	auto& rotationXYZ = registry.get<game::components::RotationEulerXYZ>(cameraEntity);
 
 	//First create a vector that represents a position at distance without any rotation applied
-	auto cameraPosition = math::DefaultForwardDirection * -arcballParameters.Distance;
+	auto cameraPosition = math::ForwardVector * -arcballParameters.Distance;
 
 	//Now apply rotation
 	cameraPosition =
-		glm::rotate(glm::radians(arcballParameters.Yaw), math::DefaultUpDirection) *
-		glm::rotate(glm::radians(-arcballParameters.Pitch), math::DefaultRightDirection) *
+		glm::rotate(glm::radians(arcballParameters.Yaw), math::UpVector) *
+		glm::rotate(glm::radians(-arcballParameters.Pitch), math::RightVector) *
 		glm::vec4{cameraPosition, 1};
 
 	//Make relative to target position
