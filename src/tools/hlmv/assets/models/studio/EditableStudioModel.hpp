@@ -1,16 +1,17 @@
 #pragma once
 
 #include <array>
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <vector>
 
 #include <glm/vec3.hpp>
 
-#include "models/Model.hpp"
+#include "assets/models/Model.hpp"
 
-#include "models/studio/StudioFileFormat.hpp"
-#include "models/studio/StudioIO.hpp"
+#include "assets/models/studio/StudioFileFormat.hpp"
+#include "assets/models/studio/StudioIO.hpp"
 
 #include "utility/Image.hpp"
 
@@ -211,7 +212,7 @@ struct EditableTexture
 	RGB24Image Image;
 };
 
-class EditableStudioModel : public Model
+class EditableStudioModel : public TModel<EditableStudioModel>
 {
 public:
 	EditableStudioModel() = default;
@@ -246,7 +247,7 @@ public:
 	std::vector<std::vector<std::uint8_t>> Transitions;
 };
 
-EditableStudioModel ConvertToEditable(const std::string& fileName, const StudioData& data);
+EditableStudioModel ConvertToEditable(const std::filesystem::path& fileName, const StudioData& data);
 
 //TODO: implement
 StudioData ConvertFromEditable(const EditableStudioModel& model);

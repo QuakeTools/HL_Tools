@@ -1,6 +1,6 @@
 #include <filesystem>
 
-#include "models/studio/EditableStudioModel.hpp"
+#include "assets/models/studio/EditableStudioModel.hpp"
 
 namespace models::studio
 {
@@ -601,13 +601,12 @@ std::vector<std::vector<short>> ConvertSkinsToEditable(const studiohdr_t& header
 	return list;
 }
 
-EditableStudioModel ConvertToEditable(const std::string& fileName, const StudioData& data)
+EditableStudioModel ConvertToEditable(const std::filesystem::path& fileName, const StudioData& data)
 {
 	const auto& header = *data.MainData;
 
 	EditableStudioModel model{};
 
-	model.FileName = fileName;
 	model.EyePosition = header.eyeposition;
 	model.Mins = header.min;
 	model.Maxs = header.max;
@@ -624,7 +623,7 @@ EditableStudioModel ConvertToEditable(const std::string& fileName, const StudioD
 	model.Attachments = ConvertAttachmentsToEditable(header);
 	model.Transitions = ConvertTransitionsToEditable(header);
 
-	const auto isDol = std::filesystem::path{fileName}.extension() == ".dol";
+	const auto isDol = fileName.extension() == ".dol";
 
 	auto readTextureData = [&](const studiohdr_t& textureHeader)
 	{

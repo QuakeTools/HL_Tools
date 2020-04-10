@@ -33,7 +33,8 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="ActionLoadModel"/>
+    <addaction name="ActionLoad"/>
+    <addaction name="ActionSave"/>
    </widget>
    <addaction name="MenuFile"/>
    <addaction name="MenuTools"/>
@@ -43,9 +44,17 @@
     <string>Options</string>
    </property>
   </action>
-  <action name="ActionLoadModel">
+  <action name="ActionLoad">
    <property name="text">
-    <string>Load Model...</string>
+    <string>Load...</string>
+   </property>
+  </action>
+  <action name="ActionSave">
+   <property name="text">
+    <string>Save</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
  </widget>

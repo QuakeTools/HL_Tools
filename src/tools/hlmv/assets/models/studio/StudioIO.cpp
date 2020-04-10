@@ -4,7 +4,8 @@
 #include <filesystem>
 #include <sstream>
 
-#include "models/studio/StudioIO.hpp"
+#include "assets/models/studio/StudioIO.hpp"
+#include "utility/FileUtilities.hpp"
 
 namespace models::studio
 {
@@ -20,46 +21,70 @@ std::string FormatSequenceGroupFileName(const std::string& baseName, const std::
 	return sequenceGroupName.str();
 }
 
+bool IsStudioHeader(FILE* file)
+{
+	//Assume the file pointer is already at the correct position
+	int id, version;
+
+	if (fread(&id, sizeof(id), 1, file) != 1)
+	{
+		return false;
+	}
+
+	const std::string_view idString{reinterpret_cast<const char*>(&id), sizeof(id)};
+
+	if (MainHeaderId.compare(idString) &&
+		SequenceGroupHeaderId.compare(idString))
+	{
+		return false;
+	}
+
+	if (fread(&version, sizeof(version), 1, file) != 1)
+	{
+		return false;
+	}
+
+	if (version != FileVersion)
+	{
+		return false;
+	}
+
+	return true;
+}
+
 template<typename T>
-static studio_ptr<T> LoadHeader(const std::string& fileName, const int version, const std::string_view headerId)
+static studio_ptr<T> LoadHeaderFromFileHandle(const std::filesystem::path& fileName, const int version, const std::string_view headerId, FILE* file)
 {
 	assert(headerId.length() == sizeof(studiohdr_t::id));
 
-	const auto file = fopen(fileName.c_str(), "rb");
-
-	if (!file)
-	{
-		throw StudioModelNotFound(std::string{"File \""} + fileName + "\" not found");
-	}
+	const auto position = ftell(file);
 
 	fseek(file, 0, SEEK_END);
-	const std::size_t size = ftell(file);
-	fseek(file, 0, SEEK_SET);
+	const std::size_t size = ftell(file) - position;
+	fseek(file, position, SEEK_SET);
 
 	auto buffer = std::make_unique<std::uint8_t[]>(size);
 
 	auto studioHeader = reinterpret_cast<T*>(buffer.get());
 
 	const size_t elementsRead = fread(studioHeader, size, 1, file);
-	fclose(file);
 
 	if (elementsRead != 1)
 	{
-		throw StudioModelInvalidFormat(std::string{"Error reading file\""} + fileName + "\"");
+		throw AssetInvalidFormat(std::string{"Error reading file \""} + fileName.u8string() + "\"");
 	}
 
 	const std::string_view idString{reinterpret_cast<const char*>(&studioHeader->id), sizeof(studioHeader->id)};
 
 	if (headerId.compare(idString))
 	{
-		throw StudioModelInvalidFormat(std::string{"The file \""} + fileName + "\" is not a studio header");
+		throw AssetInvalidFormat(std::string{"The file \""} + fileName.u8string() + "\" is not a studio header");
 	}
 
 	if (studioHeader->version != version)
 	{
-		throw StudioModelVersionDiffers(std::string{"File \""} + fileName + "\": version differs: expected \"" +
-			std::to_string(version) + "\", got \"" + std::to_string(studioHeader->version) + "\"",
-			studioHeader->version);
+		throw AssetVersionDiffers(std::string{"File \""} + fileName.u8string() + "\": version differs: expected \"" +
+			std::to_string(version) + "\", got \"" + std::to_string(studioHeader->version) + "\"");
 	}
 
 	buffer.release();
@@ -67,28 +92,46 @@ static studio_ptr<T> LoadHeader(const std::string& fileName, const int version, 
 	return studio_ptr<T>(studioHeader);
 }
 
-studio_ptr<studiohdr_t> LoadStudioMainHeader(const std::string& fileName)
+template<typename T>
+static studio_ptr<T> LoadHeader(const std::filesystem::path& fileName, const int version, const std::string_view headerId)
+{
+	assert(headerId.length() == sizeof(studiohdr_t::id));
+
+	const file_ptr file{fopen(fileName.u8string().c_str(), "rb")};
+
+	if (!file)
+	{
+		throw AssetNotFound(std::string{"File \""} + fileName.u8string() + "\" not found");
+	}
+
+	return LoadHeaderFromFileHandle<T>(fileName, version, headerId, file.get());
+}
+
+static studio_ptr<studiohdr_t> LoadStudioMainHeader(const std::filesystem::path& fileName, FILE* file)
+{
+	return LoadHeaderFromFileHandle<studiohdr_t>(fileName, FileVersion, MainHeaderId, file);
+}
+
+studio_ptr<studiohdr_t> LoadStudioMainHeader(const std::filesystem::path& fileName)
 {
 	return LoadHeader<studiohdr_t>(fileName, FileVersion, MainHeaderId);
 }
 
-studio_ptr<studioseqhdr_t> LoadStudioSequenceHeader(const std::string& fileName)
+studio_ptr<studioseqhdr_t> LoadStudioSequenceHeader(const std::filesystem::path& fileName)
 {
 	return LoadHeader<studioseqhdr_t>(fileName, FileVersion, SequenceGroupHeaderId);
 }
 
-StudioData LoadStudioFiles(const std::string& fileName)
+StudioData LoadStudioFiles(const std::filesystem::path& fileName, FILE* file)
 {
-	const std::filesystem::path fullFileName{fileName};
-
-	std::filesystem::path baseFileName{fullFileName};
+	std::filesystem::path baseFileName{fileName};
 
 	baseFileName.replace_extension();
 
-	const auto isDol = fullFileName.extension() == ".dol";
+	const auto isDol = fileName.extension() == ".dol";
 
 	//Load the model
-	auto mainHeader = LoadStudioMainHeader(fileName);
+	auto mainHeader = LoadStudioMainHeader(fileName, file);
 
 	studio_ptr<studiohdr_t> textureHeader;
 
@@ -127,9 +170,9 @@ StudioData LoadStudioFiles(const std::string& fileName)
 }
 
 template<typename T>
-static void SaveDataToFile(const std::string& fileName, const T& data)
+static void SaveDataToFile(const std::filesystem::path& fileName, const T& data)
 {
-	if (auto file = fopen(fileName.c_str(), "wb"); file)
+	if (auto file = fopen(fileName.u8string().c_str(), "wb"); file)
 	{
 		const bool success = fwrite(&data, 1, data.length, file) == data.length;
 
@@ -137,16 +180,16 @@ static void SaveDataToFile(const std::string& fileName, const T& data)
 
 		if (!success)
 		{
-			throw ErrorWritingToFile(std::string{"Error writing file \""} +fileName + "\"");
+			throw ErrorWritingToFile(std::string{"Error writing file \""} + fileName.u8string() + "\"");
 		}
 	}
 	else
 	{
-		throw CouldNotOpenFileForWriting(std::string{"Could not open file \""} +fileName + "\" for writing");
+		throw CouldNotOpenFileForWriting(std::string{"Could not open file \""} + fileName.u8string() + "\" for writing");
 	}
 }
 
-void SaveStudioFiles(const std::string& fileName, const StudioData& data)
+void SaveStudioFiles(const std::filesystem::path& fileName, const StudioData& data)
 {
 	if (fileName.empty())
 	{
@@ -160,9 +203,7 @@ void SaveStudioFiles(const std::string& fileName, const StudioData& data)
 
 	SaveDataToFile(fileName, *data.MainData);
 
-	const std::filesystem::path fullFileName{fileName};
-
-	auto baseFileName{fullFileName};
+	auto baseFileName{fileName};
 
 	baseFileName.replace_extension();
 

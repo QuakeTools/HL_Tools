@@ -1,5 +1,6 @@
 target_sources(HLMV
 	PRIVATE
+		FileUtilities.hpp
 		Image.hpp
 		MemoryUtilities.hpp)
 

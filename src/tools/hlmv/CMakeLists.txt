@@ -19,9 +19,9 @@ target_sources(HLMV
 		Main.cpp)
 
 add_subdirectory(application)
+add_subdirectory(assets)
 add_subdirectory(game)
 add_subdirectory(graphics)
-add_subdirectory(models)
 add_subdirectory(ui)
 add_subdirectory(utility)
 

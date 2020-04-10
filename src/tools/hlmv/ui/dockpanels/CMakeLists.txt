@@ -1,0 +1,14 @@
+target_sources(HLMV
+	PRIVATE
+		AssetExplorer.cpp
+		AssetExplorer.hpp
+		AssetExplorer.ui
+		DisplayProperties.cpp
+		DisplayProperties.hpp
+		DisplayProperties.ui
+		RenderProperties.hpp
+		RenderProperties.ui
+		SceneInfo.hpp
+		SceneInfo.ui
+		Timeline.hpp
+		Timeline.ui)

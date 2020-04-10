@@ -4,6 +4,8 @@ target_sources(HLMV
 		EditableStudioModel.hpp
 		StudioFileFormat.hpp
 		StudioIO.cpp
-		StudioIO.hpp)
+		StudioIO.hpp
+		StudioModelAssetReader.hpp
+		StudioModelAssetWriter.hpp)
 
 add_subdirectory(rendering)
