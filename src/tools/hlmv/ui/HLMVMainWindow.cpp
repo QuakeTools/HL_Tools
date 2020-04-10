@@ -20,6 +20,8 @@
 
 #include "graphics/components/Camera.hpp"
 
+#include "ui/CameraOperators.hpp"
+
 #include "ui/HLMVMainWindow.hpp"
 #include "ui/ProgramState.hpp"
 #include "ui/ViewerWindow.hpp"
@@ -27,6 +29,7 @@
 #include "ui/dialogs/SaveAssetDialog.hpp"
 
 #include "ui/dockpanels/AssetExplorer.hpp"
+#include "ui/dockpanels/CameraInfo.hpp"
 #include "ui/dockpanels/DisplayProperties.hpp"
 #include "ui/dockpanels/RenderProperties.hpp"
 #include "ui/dockpanels/SceneInfo.hpp"
@@ -42,6 +45,7 @@ HLMVMainWindow::HLMVMainWindow()
 	: QMainWindow()
 	, _timer(new QTimer(this))
 	, _programState(new ProgramState(this))
+	, _cameraOperator(std::make_unique<FreeLookCameraOperator>())
 {
 	{
 		//TODO: automate type registration
@@ -89,6 +93,13 @@ HLMVMainWindow::HLMVMainWindow()
 	createDock(new dockpanels::SceneInfo(this), "Scene Info",
 		Qt::DockWidgetArea::LeftDockWidgetArea | Qt::DockWidgetArea::RightDockWidgetArea | Qt::DockWidgetArea::BottomDockWidgetArea, Qt::DockWidgetArea::LeftDockWidgetArea);
 
+	auto cameraInfo = new dockpanels::CameraInfo(this);
+
+	createDock(cameraInfo, "Camera Info",
+		Qt::DockWidgetArea::LeftDockWidgetArea | Qt::DockWidgetArea::RightDockWidgetArea | Qt::DockWidgetArea::BottomDockWidgetArea, Qt::DockWidgetArea::LeftDockWidgetArea);
+
+	connect(GetState(), &ProgramState::CameraInfoChanged, cameraInfo, &dockpanels::CameraInfo::UpdateCameraInfo);
+
 	createDock(new dockpanels::Timeline(this), "Timeline",
 		Qt::DockWidgetArea::BottomDockWidgetArea, Qt::DockWidgetArea::BottomDockWidgetArea);
 
@@ -106,6 +117,8 @@ HLMVMainWindow::HLMVMainWindow()
 		connect(assets, &EditorAssetList::CloseAsset, this, &HLMVMainWindow::OnTryCloseAsset);
 	}
 
+	connect(_viewerWindow, &ViewerWindow::MouseEvent, this, &HLMVMainWindow::OnViewerWindowMouseEvent);
+
 	_timer->start(0);
 }
 
@@ -113,7 +126,23 @@ HLMVMainWindow::~HLMVMainWindow() = default;
 
 void HLMVMainWindow::OnTick()
 {
+	auto currentAsset = GetState()->GetAssets()->GetCurrentAsset();
+
+	//TODO: update frequency should be controllable
+	if (currentAsset)
+	{
+		currentAsset->GetWorld()->Update();
+	}
+
 	_viewerWindow->update();
+
+	//Update the camera after a frame so any pending changes to camera settings are flushed to all components
+	if (_cameraUpdated)
+	{
+		_cameraUpdated = false;
+
+		emit GetState()->CameraInfoChanged(currentAsset);
+	}
 }
 
 void HLMVMainWindow::PromptLoadAsset()
@@ -161,6 +190,8 @@ void HLMVMainWindow::OnCurrentAssetChanged(const QSharedPointer<EditorAsset>& cu
 	_viewerWindow->SetWorld(world);
 
 	UpdateTitle();
+
+	_cameraUpdated = true;
 }
 
 void HLMVMainWindow::OnAssetFileNameChanged(const QString& fileName)
@@ -191,6 +222,18 @@ void HLMVMainWindow::OnTryCloseAsset(const QSharedPointer<EditorAsset>& asset)
 	}
 
 	GetState()->GetAssets()->RemoveAsset(asset);
+}
+
+void HLMVMainWindow::OnViewerWindowMouseEvent(QMouseEvent& event)
+{
+	if (const auto asset = GetState()->GetAssets()->GetCurrentAsset(); asset && asset->GetCurrentCamera() != entt::null)
+	{
+		_cameraOperator->MouseEvent(*asset->GetWorld()->GetRegistry(), asset->GetCurrentCamera(), event);
+
+		_cameraUpdated = true;
+
+		//emit GetState()->CameraInfoChanged(GetState()->GetAssets()->GetCurrentAsset());
+	}
 }
 
 void HLMVMainWindow::UpdateTitle()
@@ -241,24 +284,29 @@ void HLMVMainWindow::AddDocumentForAsset(const QString& fileName, std::unique_pt
 	}
 
 	{
-		auto& registry = world.GetRegistry();
+		auto& registry = *world.GetRegistry();
 
 		auto& scene = registry.set<graphics::Scene>();
 
 		scene.CollectObjectsSink.connect<&models::generic_mesh::CollectGenericMesh>();
 
 		//Create the default camera
+		//TODO: use functions to create interdependent components at the same time
 		auto cameraEntity = registry.create();
 
 		auto& camera = registry.assign<graphics::components::Camera>(cameraEntity);
 
-		camera.BackgroundColor = glm::vec3{63 / 255.f, 127 / 255.f, 127 / 255.f};
+		camera.BackgroundColor = glm::vec4{63 / 255.f, 127 / 255.f, 127 / 255.f, 1.f};
+
+		auto& position = registry.assign<game::components::Translation>(cameraEntity);
+		auto& rotationXYZ = registry.assign<game::components::RotationEulerXYZ>(cameraEntity);
+		auto& rotation = registry.assign<game::components::Rotation>(cameraEntity);
+
+		position.Value.z = 10.f;
 
 		auto& localToWorld = registry.assign<game::components::LocalToWorld>(cameraEntity);
 
-		auto& position = registry.assign<game::components::Translation>(cameraEntity);
-
-		position.Value.z = 10.f;
+		editorAsset->SetCurrentCamera(cameraEntity);
 	}
 
 	//TODO: add collect handler for studio model

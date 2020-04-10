@@ -19,6 +19,8 @@ namespace ui
 {
 class ViewerWindow final : public QOpenGLWindow
 {
+	Q_OBJECT
+
 public:
 	ViewerWindow(QWidget* parent = nullptr);
 	~ViewerWindow();
@@ -30,7 +32,25 @@ public:
 		_world = world;
 	}
 
+signals:
+	void MouseEvent(QMouseEvent& event);
+
 protected:
+	void mousePressEvent(QMouseEvent* event) override final
+	{
+		emit MouseEvent(*event);
+	}
+
+	void mouseReleaseEvent(QMouseEvent* event) override final
+	{
+		emit MouseEvent(*event);
+	}
+
+	void mouseMoveEvent(QMouseEvent* event) override final
+	{
+		emit MouseEvent(*event);
+	}
+
 	void initializeGL() override;
 	void resizeGL(int w, int h) override;
 	void paintGL() override;

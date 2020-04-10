@@ -32,6 +32,10 @@ public:
 
 	EditorAssetList* GetAssets() { return _assetList; }
 
+signals:
+	//TODO: maybe put this somewhere else
+	void CameraInfoChanged(const QSharedPointer<EditorAsset>& asset);
+
 private:
 	std::unique_ptr<AssetTypes> _assetTypes;
 

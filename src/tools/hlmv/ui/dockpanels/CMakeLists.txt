@@ -3,6 +3,8 @@ target_sources(HLMV
 		AssetExplorer.cpp
 		AssetExplorer.hpp
 		AssetExplorer.ui
+		CameraInfo.hpp
+		CameraInfo.ui
 		DisplayProperties.cpp
 		DisplayProperties.hpp
 		DisplayProperties.ui

@@ -10,6 +10,8 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
 
+#include "utility/math/CoordinateSystem.hpp"
+
 namespace game::components
 {
 /**
@@ -79,23 +81,17 @@ struct LocalToWorld final
 
 	glm::vec3 GetForward() const
 	{
-		const auto inverted = glm::inverse(Value);
-
-		return glm::normalize(glm::vec3(inverted[2]));
-	}
-
-	glm::vec3 GetUp() const
-	{
-		const auto inverted = glm::inverse(Value);
-
-		return glm::normalize(glm::vec3(inverted[1]));
+		return math::GetForwardVector(Value);
 	}
 
 	glm::vec3 GetRight() const
 	{
-		const auto inverted = glm::inverse(Value);
+		return math::GetRightVector(Value);
+	}
 
-		return glm::normalize(glm::vec3(inverted[0]));
+	glm::vec3 GetUp() const
+	{
+		return math::GetUpVector(Value);
 	}
 };
 
@@ -115,6 +111,18 @@ struct Hierarchy final
 
 	constexpr bool HasChildren() { return FirstChild != entt::null; }
 };
+
+inline entt::entity GetParent(entt::registry& registry, entt::entity entity)
+{
+	assert(registry.valid(entity));
+
+	if (auto hierarchy = registry.try_get<Hierarchy>(entity); hierarchy)
+	{
+		return hierarchy->Parent;
+	}
+
+	return entt::null;
+}
 
 inline void SetParent(entt::registry& registry, entt::entity entity, entt::entity parent)
 {

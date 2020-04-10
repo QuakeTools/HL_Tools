@@ -15,6 +15,7 @@
 
 namespace ui
 {
+class CameraOperator;
 class MainPanel;
 class ProgramState;
 class ViewerWindow;
@@ -48,6 +49,8 @@ private slots:
 
 	void OnTryCloseAsset(const QSharedPointer<EditorAsset>& asset);
 
+	void OnViewerWindowMouseEvent(QMouseEvent& event);
+
 private:
 	void UpdateTitle();
 
@@ -78,5 +81,10 @@ private:
 	QTimer* _timer;
 
 	ProgramState* _programState;
+
+	//TODO: temporary
+	std::unique_ptr<CameraOperator> _cameraOperator;
+
+	bool _cameraUpdated = false;
 };
 }

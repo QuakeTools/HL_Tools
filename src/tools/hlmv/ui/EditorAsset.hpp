@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include <entt/entity/entity.hpp>
+
 #include <QObject>
 #include <QSharedPointer>
 #include <QString>
@@ -37,6 +39,13 @@ public:
 
 	game::World* GetWorld() { return &_world; }
 
+	entt::entity GetCurrentCamera() { return _currentCamera; }
+
+	void SetCurrentCamera(entt::entity entity)
+	{
+		_currentCamera = entity;
+	}
+
 	bool HasUnsavedChanges() const { return _hasUnsavedChanges; }
 
 	void SetHasUnsavedChanges(bool value)
@@ -70,6 +79,8 @@ private:
 	std::unique_ptr<Asset> _asset;
 
 	game::World _world;
+
+	entt::entity _currentCamera{entt::null};
 
 	bool _hasUnsavedChanges = false;
 };
@@ -157,7 +168,7 @@ public slots:
 
 	void SetCurrentAsset(const QSharedPointer<EditorAsset>& asset)
 	{
-		if (!_assets.contains(asset))
+		if (asset && !_assets.contains(asset))
 		{
 			return;
 		}

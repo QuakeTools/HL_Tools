@@ -16,14 +16,11 @@
 
 #include "graphics/components/Camera.hpp"
 
+#include "utility/math/CoordinateSystem.hpp"
 #include "utility/math/MathDefinitions.hpp"
 
 namespace graphics
 {
-static constexpr glm::vec3 DefaultLookDirection{1, 0, 0};
-static constexpr glm::vec3 DefaultUpDirection{0, 0, 1};
-static constexpr glm::vec3 DefaultRightDirection{0, 1, 0};
-
 static glm::mat4x4 CreatePerspectiveMatrix(float fov, float aspectRatio, float nearZ, float farZ)
 {
 	if (fov <= 0.0f || fov >= math::PI<float>)
@@ -93,23 +90,6 @@ static glm::mat4x4 CreatePerspective(
 	return persp;
 }
 
-//GoldSource's coordinate system points Z up, X forward, and Y left
-	//See https://developer.valvesoftware.com/wiki/Coordinates
-	//Need to scale X so inputs produce the correct results,
-	//And rotate yaw 180 degrees so yaw 0 points to the east
-	//This does not look like GoldSource's code because it uses a different approach to view matrix construction
-	//GoldSource modifies the global settings by applying the inverse of the rotation and view origin
-	//This is the "standard" way of applying view settings by using matrices in normal model-view techniques
-	//Pitch goes first because in model viewer yaw is relative to the model, while pitch is relative to the world
-static glm::mat4 GetRotationMatrix(const float pitch, const float yaw, const float roll)
-{
-	return
-		glm::rotate(math::PI<float> + yaw, glm::vec3{0, 0, 1}) *
-		glm::rotate(pitch, glm::vec3{0, 1, 0}) *
-		glm::rotate(roll, glm::vec3{1, 0, 0}) *
-		glm::scale(glm::vec3{-1, 1, 1});
-}
-
 void SceneContext::UpdateCameraBuffers(api::GraphicsDevice& gd, const components::Camera& camera, const game::components::LocalToWorld& localToWorld)
 {
 	const auto fbWidth = gd.GetSwapChainFrameBuffer().GetWidth();
@@ -140,19 +120,9 @@ void SceneContext::UpdateCameraBuffers(api::GraphicsDevice& gd, const components
 	default: throw std::invalid_argument("Unsupported projection mode");
 	}
 
-	const auto rotationQuat = localToWorld.GetRotation();
 	const auto position = localToWorld.GetPosition();
 
-	const auto eulerRotation = glm::eulerAngles(rotationQuat);
-
-	//Translate view matrix to GoldSource coordinate system
-	const auto lookRotation = GetRotationMatrix(eulerRotation.y, eulerRotation.z, eulerRotation.x);
-
-	const auto lookDirection = glm::vec3(lookRotation * glm::vec4{DefaultLookDirection, 1});
-
-	const auto upDirection = glm::vec3{lookRotation * glm::vec4{ DefaultUpDirection, 1 }};
-
-	const auto view = glm::lookAt(position, position + lookDirection, upDirection);
+	const auto view = glm::lookAt(position, position + localToWorld.GetForward(), localToWorld.GetUp());
 
 	gd.UpdateBuffer(ProjectionBuffer, 0, projection);
 	gd.UpdateBuffer(ViewBuffer, 0, view);

@@ -16,7 +16,7 @@ public:
 	World& operator=(const World&) = delete;
 	~World() = default;
 
-	entt::registry& GetRegistry() { return _registry; }
+	entt::registry* GetRegistry() { return &_registry; }
 
 	void Update();
 

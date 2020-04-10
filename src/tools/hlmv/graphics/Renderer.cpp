@@ -60,12 +60,9 @@ void Renderer::Render(game::World* world)
 
 	if (world)
 	{
-		auto& registry = world->GetRegistry();
+		auto& registry = *world->GetRegistry();
 
 		auto& scene = registry.ctx<Scene>();
-
-		//TODO: doesn't really belong in this method
-		world->Update();
 
 		_sceneRenderer->RenderAllStages(registry, scene, *_gd, *_sc);
 	}

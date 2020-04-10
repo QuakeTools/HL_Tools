@@ -1,13 +1,19 @@
 #pragma once
 
+#include <cmath>
+
 #include <entt/entity/registry.hpp>
 
 #include <glm/mat4x4.hpp>
+#include <glm/trigonometric.hpp>
 #include <glm/vec3.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/transform.hpp>
 
 #include "game/components/Entities.hpp"
+
+#include "utility/math/CoordinateSystem.hpp"
+#include "utility/math/MathDefinitions.hpp"
 
 namespace game::systems
 {
@@ -16,7 +22,9 @@ inline void UpdateRotations(entt::registry& registry)
 	//Update rotation components from Euler first
 	registry.view<components::RotationEulerXYZ, components::Rotation>().each([](const auto& eulerXYZ, auto& rotation)
 		{
-			rotation.Value = glm::quat(eulerXYZ.Value);
+			const auto angles = math::FixAngles(eulerXYZ.Value);
+
+			rotation.Value = math::PitchYawRollToRotation(angles);
 		});
 }
 
@@ -25,13 +33,11 @@ inline void UpdateLocalToWorld(entt::registry& registry)
 	//Update LocalToWorld for all entities, including entities that have parents
 	registry.view<components::LocalToWorld>().each([&registry](const auto entity, components::LocalToWorld& localToWorld)
 		{
+			localToWorld.Value = glm::identity<glm::mat4x4>();
+
 			if (auto translation = registry.try_get<components::Translation>(entity); translation)
 			{
-				localToWorld.Value = glm::translate(translation->Value);
-			}
-			else
-			{
-				localToWorld.Value = glm::identity<glm::mat4x4>();
+				localToWorld.Value = glm::translate(localToWorld.Value, translation->Value);
 			}
 
 			if (auto rotation = registry.try_get<components::Rotation>(entity); rotation)

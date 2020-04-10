@@ -49,7 +49,7 @@ void SceneRenderer::RenderAllStages(entt::registry& registry, Scene& scene, api:
 
 			gd.SetViewport(viewport);
 			gd.SetScissorRect(viewport.X, viewport.Y, viewport.Width, viewport.Height);
-			gd.ClearColorTarget({camera.BackgroundColor, 1});
+			gd.ClearColorTarget(camera.BackgroundColor);
 
 			sc.UpdateCameraBuffers(gd, camera, localToWorld);
 

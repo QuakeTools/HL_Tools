@@ -1,11 +1,17 @@
 #pragma once
 
+#include <glm/mat4x4.hpp>
 #include <glm/trigonometric.hpp>
 #include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
 
 #include "graphics/GraphicsDefinitions.hpp"
 
 #include "graphics/api/GraphicsDevice.hpp"
+
+#include "utility/math/MathDefinitions.hpp"
 
 namespace graphics::components
 {
@@ -21,7 +27,7 @@ enum class ProjectionMode
 */
 struct Camera final
 {
-	glm::vec3 BackgroundColor{0.f};
+	glm::vec4 BackgroundColor{0.f, 0.f, 0.f, 1.f};
 
 	//Which render passes to render with this camera
 	RenderPasses CullingMask = RenderPass::All;
