@@ -17,6 +17,7 @@
 #include "graphics/components/Camera.hpp"
 
 #include "ui/EditorAsset.hpp"
+#include "ui/ProgramState.hpp"
 
 #include "utility/math/CoordinateSystem.hpp"
 
@@ -27,12 +28,17 @@ class CameraInfo final : public QWidget
 	Q_OBJECT
 
 public:
-	CameraInfo(QWidget* parent = nullptr)
+	CameraInfo(ProgramState* programState, QWidget* parent = nullptr)
 		: QWidget(parent)
+		, _programState(programState)
 	{
 		_ui.setupUi(this);
 
 		setEnabled(false);
+
+		_ui.CameraType->setCurrentIndex(_programState->GetCameras()->GetCurrentCameraOperatorIndex());
+
+		connect(_ui.CameraType, qOverload<int>(&QComboBox::currentIndexChanged), this, &CameraInfo::CameraTypeChanged);
 	}
 
 	~CameraInfo() = default;
@@ -43,8 +49,10 @@ public:
 	}
 
 public slots:
-	void UpdateCameraInfo(const QSharedPointer<EditorAsset>& asset)
+	void UpdateCameraInfo()
 	{
+		const auto asset = _programState->GetAssets()->GetCurrentAsset();
+
 		const auto enabled = asset && asset->GetCurrentCamera() != entt::null;
 
 		setEnabled(enabled);
@@ -59,17 +67,7 @@ public slots:
 			const auto& rotationEulerXYZ = registry.get<game::components::RotationEulerXYZ>(cameraEntity);
 
 			//Calculate the absolute rotation of the camera without using LocalToWorld to ensure the values are accurate for each axis of rotation
-			auto rotationInDegrees = rotationEulerXYZ.Value;
-
-			for (auto parent = game::components::GetParent(registry, cameraEntity); parent != entt::null; parent = game::components::GetParent(registry, parent))
-			{
-				if (auto parentRotation = registry.try_get<game::components::RotationEulerXYZ>(parent); parentRotation)
-				{
-					rotationInDegrees += parentRotation->Value;
-				}
-			}
-
-			rotationInDegrees = math::FixAngles(rotationInDegrees);
+			const auto rotationInDegrees = game::components::CalculateAbsoluteRotationEulerXYZ(registry, cameraEntity);
 
 			SetVector(
 				localToWorld.GetPosition(),
@@ -125,6 +123,11 @@ public slots:
 		}
 	}
 
+	void CameraTypeChanged(int index)
+	{
+		_programState->GetCameras()->SetCameraOperatorByIndex(index);
+	}
+
 private:
 	static void SetVector(const glm::vec3& vector, QLineEdit* x, QLineEdit* y, QLineEdit* z)
 	{
@@ -135,5 +138,7 @@ private:
 
 private:
 	Ui_CameraInfo _ui;
+
+	ProgramState* _programState;
 };
 }

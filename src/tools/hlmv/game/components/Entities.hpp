@@ -242,4 +242,23 @@ inline void ClearParent(entt::registry& registry, entt::entity entity)
 {
 	SetParent(registry, entity, entt::null);
 }
+
+inline glm::vec3 CalculateAbsoluteRotationEulerXYZ(entt::registry& registry, entt::entity entity)
+{
+	assert(registry.valid(entity));
+
+	const auto& rotationEulerXYZ = registry.get<RotationEulerXYZ>(entity);
+
+	auto rotationInDegrees = rotationEulerXYZ.Value;
+
+	for (auto parent = game::components::GetParent(registry, entity); parent != entt::null; parent = game::components::GetParent(registry, parent))
+	{
+		if (auto parentRotation = registry.try_get<RotationEulerXYZ>(parent); parentRotation)
+		{
+			rotationInDegrees += parentRotation->Value;
+		}
+	}
+
+	return math::FixAngles(rotationInDegrees);
+}
 }

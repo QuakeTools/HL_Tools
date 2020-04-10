@@ -2,6 +2,7 @@ target_sources(HLMV
 	PRIVATE
 		CameraOperators.cpp
 		CameraOperators.hpp
+		Cameras.hpp
 		EditorAsset.hpp
 		HLMVMainWindow.cpp
 		HLMVMainWindow.hpp

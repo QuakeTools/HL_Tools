@@ -7,6 +7,7 @@
 
 #include "assets/AssetTypes.hpp"
 
+#include "ui/Cameras.hpp"
 #include "ui/EditorAsset.hpp"
 
 namespace ui
@@ -23,6 +24,7 @@ public:
 		: QObject(parent)
 		, _assetTypes(std::make_unique<AssetTypes>())
 		, _assetList(new EditorAssetList(this))
+		, _cameras(new Cameras(_assetList, this))
 	{
 	}
 
@@ -32,13 +34,13 @@ public:
 
 	EditorAssetList* GetAssets() { return _assetList; }
 
-signals:
-	//TODO: maybe put this somewhere else
-	void CameraInfoChanged(const QSharedPointer<EditorAsset>& asset);
+	Cameras* GetCameras() { return _cameras; }
 
 private:
 	std::unique_ptr<AssetTypes> _assetTypes;
 
 	EditorAssetList* _assetList;
+
+	Cameras* _cameras;
 };
 }

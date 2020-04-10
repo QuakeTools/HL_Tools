@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include <entt/entity/registry.hpp>
+
 #include <QMainWindow>
 #include <QSharedPointer>
 #include <QString>
@@ -15,7 +17,6 @@
 
 namespace ui
 {
-class CameraOperator;
 class MainPanel;
 class ProgramState;
 class ViewerWindow;
@@ -56,6 +57,8 @@ private:
 
 	void LoadAsset(const QString& fileName);
 
+	void UpdateCameras(entt::registry& registry);
+
 	void AddDocumentForAsset(const QString& fileName, std::unique_ptr<Asset>&& asset);
 
 	/**
@@ -81,9 +84,6 @@ private:
 	QTimer* _timer;
 
 	ProgramState* _programState;
-
-	//TODO: temporary
-	std::unique_ptr<CameraOperator> _cameraOperator;
 
 	bool _cameraUpdated = false;
 };

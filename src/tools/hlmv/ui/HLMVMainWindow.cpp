@@ -21,7 +21,6 @@
 #include "graphics/components/Camera.hpp"
 
 #include "ui/CameraOperators.hpp"
-
 #include "ui/HLMVMainWindow.hpp"
 #include "ui/ProgramState.hpp"
 #include "ui/ViewerWindow.hpp"
@@ -45,7 +44,6 @@ HLMVMainWindow::HLMVMainWindow()
 	: QMainWindow()
 	, _timer(new QTimer(this))
 	, _programState(new ProgramState(this))
-	, _cameraOperator(std::make_unique<FreeLookCameraOperator>())
 {
 	{
 		//TODO: automate type registration
@@ -93,12 +91,12 @@ HLMVMainWindow::HLMVMainWindow()
 	createDock(new dockpanels::SceneInfo(this), "Scene Info",
 		Qt::DockWidgetArea::LeftDockWidgetArea | Qt::DockWidgetArea::RightDockWidgetArea | Qt::DockWidgetArea::BottomDockWidgetArea, Qt::DockWidgetArea::LeftDockWidgetArea);
 
-	auto cameraInfo = new dockpanels::CameraInfo(this);
+	auto cameraInfo = new dockpanels::CameraInfo(GetState(), this);
 
 	createDock(cameraInfo, "Camera Info",
 		Qt::DockWidgetArea::LeftDockWidgetArea | Qt::DockWidgetArea::RightDockWidgetArea | Qt::DockWidgetArea::BottomDockWidgetArea, Qt::DockWidgetArea::LeftDockWidgetArea);
 
-	connect(GetState(), &ProgramState::CameraInfoChanged, cameraInfo, &dockpanels::CameraInfo::UpdateCameraInfo);
+	connect(GetState()->GetCameras(), &Cameras::CameraInfoChanged, cameraInfo, &dockpanels::CameraInfo::UpdateCameraInfo);
 
 	createDock(new dockpanels::Timeline(this), "Timeline",
 		Qt::DockWidgetArea::BottomDockWidgetArea, Qt::DockWidgetArea::BottomDockWidgetArea);
@@ -141,7 +139,7 @@ void HLMVMainWindow::OnTick()
 	{
 		_cameraUpdated = false;
 
-		emit GetState()->CameraInfoChanged(currentAsset);
+		emit GetState()->GetCameras()->CameraInfoChanged();
 	}
 }
 
@@ -228,11 +226,9 @@ void HLMVMainWindow::OnViewerWindowMouseEvent(QMouseEvent& event)
 {
 	if (const auto asset = GetState()->GetAssets()->GetCurrentAsset(); asset && asset->GetCurrentCamera() != entt::null)
 	{
-		_cameraOperator->MouseEvent(*asset->GetWorld()->GetRegistry(), asset->GetCurrentCamera(), event);
+		GetState()->GetCameras()->GetCurrentCameraOperator()->MouseEvent(*asset->GetWorld()->GetRegistry(), asset->GetCurrentCamera(), event);
 
 		_cameraUpdated = true;
-
-		//emit GetState()->CameraInfoChanged(GetState()->GetAssets()->GetCurrentAsset());
 	}
 }
 
@@ -269,6 +265,19 @@ void HLMVMainWindow::LoadAsset(const QString& fileName)
 	}
 }
 
+void HLMVMainWindow::UpdateCameras(entt::registry& registry)
+{
+	if (const auto asset = GetState()->GetAssets()->GetCurrentAsset();
+		asset &&
+		//Only update cameras for the current asset
+		//TODO: can connect and disconnect the update handler whenever the asset changes to avoid having to do this
+		asset->GetWorld()->GetRegistry() == &registry &&
+		asset->GetCurrentCamera() != entt::null)
+	{
+		GetState()->GetCameras()->GetCurrentCameraOperator()->UpdateCamera(registry, asset->GetCurrentCamera());
+	}
+}
+
 void HLMVMainWindow::AddDocumentForAsset(const QString& fileName, std::unique_ptr<Asset>&& asset)
 {
 	QSharedPointer<EditorAsset> editorAsset{new EditorAsset(fileName, std::move(asset))};
@@ -278,6 +287,7 @@ void HLMVMainWindow::AddDocumentForAsset(const QString& fileName, std::unique_pt
 	auto& world = *editorAsset->GetWorld();
 
 	{
+		world.UpdateSink.connect<&HLMVMainWindow::UpdateCameras>(this);
 		world.UpdateSink.connect<&game::systems::UpdateRotations>();
 		world.UpdateSink.connect<&game::systems::UpdateLocalToWorld>();
 		world.UpdateSink.connect<&game::systems::UpdateLocalToParent>();
@@ -297,6 +307,11 @@ void HLMVMainWindow::AddDocumentForAsset(const QString& fileName, std::unique_pt
 		auto& camera = registry.assign<graphics::components::Camera>(cameraEntity);
 
 		camera.BackgroundColor = glm::vec4{63 / 255.f, 127 / 255.f, 127 / 255.f, 1.f};
+
+		auto& arcballParameters = registry.assign<graphics::components::ArcballParameters>(cameraEntity);
+
+		arcballParameters.Position.z = 64.f;
+		arcballParameters.Distance = 128.f;
 
 		auto& position = registry.assign<game::components::Translation>(cameraEntity);
 		auto& rotationXYZ = registry.assign<game::components::RotationEulerXYZ>(cameraEntity);
